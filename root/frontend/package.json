@@ -7,8 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
-    "server-build": "sudo rm -r ../backend/public ; npm run build ; mv ./dist ../backend/public"
+    "preview": "vite preview"
   },
   "dependencies": {
     "axios": "^1.4.0",
