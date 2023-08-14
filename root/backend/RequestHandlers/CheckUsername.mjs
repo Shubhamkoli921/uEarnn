@@ -14,6 +14,6 @@ export default function CheckUsername(req, res) {
       })
       .catch((e) => {});
   } else {
-    res.status(400).json({ success: false, error: "Invalid username" });
+    res.status(400).json({ success: false, error: "Invalid request" });
   }
 }

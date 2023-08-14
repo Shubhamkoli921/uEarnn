@@ -1,9 +1,19 @@
+/**
+ *
+ * @param {String} name
+ * @returns {Boolean} true if name string passes all the criteria else false
+ */
 export function isValidName(name) {
   name = name.trim();
   if (name === "" || name.length > 30) return false;
   return true;
 }
 
+/**
+ *
+ * @param {String} password
+ * @returns {Boolean} true if password string passes all the criteria else false
+ */
 export function isValidPassword(password) {
   password = password.trim();
   if (
@@ -17,6 +27,11 @@ export function isValidPassword(password) {
   return true;
 }
 
+/**
+ *
+ * @param {String} username
+ * @returns {Boolean} true if username string passes all the criteria else false
+ */
 export function isValidUsername(username) {
   username = username.trim();
   if (

@@ -11,7 +11,11 @@ import ReferralHistory from "../Models/ReferralHistory.mjs";
 
 export default function Signup(req, res) {
   const { f_name, l_name, u_name, password } = req["body"];
+
+  //get the referrer id from url query
   const referrerId = req.query["referrer"];
+
+  //validating the form data
   if (
     !f_name ||
     !isValidName(f_name) ||
@@ -22,8 +26,10 @@ export default function Signup(req, res) {
     !password ||
     !isValidPassword(password)
   ) {
+    //if form data is invalid send 400 status code
     res.status(400).json({ success: false, error: "Invalid form data!" });
   } else {
+    //function to perform database transaction to store new user's data in users collection and referralhistories collection
     async function newUserCreationTransaction() {
       const userCreationTransactionSession = await mongoose.startSession();
       try {
@@ -33,7 +39,7 @@ export default function Signup(req, res) {
           f_name: f_name,
           l_name: l_name,
           u_name: u_name,
-          p_hash: createPasswordHash(password),
+          p_hash: createPasswordHash(password), //hashing the password
         });
         await newUser.save();
         const newUserReferralHistory = new ReferralHistory({
@@ -41,6 +47,10 @@ export default function Signup(req, res) {
           history: [],
         });
         await newUserReferralHistory.save();
+
+        //if the url query has referrer then perform database transaction to do following things
+        //1: increment the uearn coins of referrer by value defined in enviorenment
+        //2: push the new user's first name and last name in referrer's referral history
         if (referrerId) {
           async function ReferrerRewardTransction() {
             const transactionSession = await mongoose.startSession();
@@ -82,6 +92,7 @@ export default function Signup(req, res) {
     }
     newUserCreationTransaction()
       .then(() => {
+        //after everything is done redirect the user to /login page
         res.redirect("/login");
       })
       .catch((e) => {

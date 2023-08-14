@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 /**
  *
  * @param {String} Authentication TOken
- * @returns {Boolean} return if token is valid
+ * @returns {Boolean} returns true if token is valid else false
  */
 
 function verifyAuthToken(AuthToken) {
