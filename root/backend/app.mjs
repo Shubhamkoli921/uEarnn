@@ -12,42 +12,43 @@ import CheckLoginStatus from "./RequestHandlers/CheckLoginStatus.mjs";
 
 //middelwares
 import AuthenticateUser from "./Middlewares/AuthenticateUser.mjs";
+import cookieParser from "cookie-parser";
 
 /**
  * @description Creates new express server instance
  * @returns {Promise}
  */
 export default async function app() {
-  return new Promise(async (resolve, reject) => {
-    await connectToDatabase().catch((error) => {
-      console.error("Error connecting to the database:", error);
-      //kill the process if can't connect to database
-      process.exit(1);
-    });
+  await connectToDatabase().catch((error) => {
+    console.error("Error connecting to the database:", error);
+    //kill the process if can't connect to database
+    process.exit(1);
+  });
 
-    const app = express();
-    //middelware to accept request from cross-origin
-    app.use(cors());
-    //middelware to parse json body present in requests
-    app.use(bodyParser.json());
+  const app = express();
+  //middelware to accept request from cross-origin
+  app.use(cors());
+  //middelware to parse json body present in requests
+  app.use(bodyParser.json());
+  //middelware to parse cookies
+  app.use(cookieParser());
 
-    // open routes
-    app.post("/api/login", Login);
-    app.post("/api/signup", Signup);
+  // open routes
+  app.post("/api/login", Login);
+  app.post("/api/signup", Signup);
 
-    app.get("/api/check-username/:userName", CheckUsername);
+  app.get("/api/check-username/:userName", CheckUsername);
 
-    app.get("/api/login-status", CheckLoginStatus);
+  app.get("/api/login-status", CheckLoginStatus);
 
-    //authenticated routes
-    app.get("/api/user-info", AuthenticateUser, GetUserInfo);
+  //authenticated routes
+  app.get("/api/user-info", AuthenticateUser, GetUserInfo);
 
-    app.listen(process.env.PORT, () => {
-      console.log(
-        `${new Date()}: Server instance with process id:${
-          process.pid
-        } listning at port: ${process.env.PORT}`
-      );
-    });
+  app.listen(process.env.PORT, () => {
+    console.log(
+      `${new Date()}: Server instance with process id:${
+        process.pid
+      } listning at port: ${process.env.PORT}`
+    );
   });
 }

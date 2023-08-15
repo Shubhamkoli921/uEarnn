@@ -1,3 +1,5 @@
+//code by Dhiraj
+
 import mongoose from "mongoose";
 
 // Define the User schema

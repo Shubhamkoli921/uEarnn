@@ -1,3 +1,5 @@
+//code by Dhiraj
+
 //after the introduction of payment, there will be need of changes
 import {
   isValidName,
@@ -29,74 +31,67 @@ export default function Signup(req, res) {
     //if form data is invalid send 400 status code
     res.status(400).json({ success: false, error: "Invalid form data!" });
   } else {
-    //function to perform database transaction to store new user's data in users collection and referralhistories collection
-    async function newUserCreationTransaction() {
-      const userCreationTransactionSession = await mongoose.startSession();
-      try {
-        userCreationTransactionSession.startTransaction();
-        const newUser = new User({
-          _id: new mongoose.Types.ObjectId(),
-          f_name: f_name,
-          l_name: l_name,
-          u_name: u_name,
-          p_hash: createPasswordHash(password), //hashing the password
-        });
-        await newUser.save();
-        const newUserReferralHistory = new ReferralHistory({
-          _id: newUser._id,
-          history: [],
-        });
-        await newUserReferralHistory.save();
-
+    new User({
+      _id: new mongoose.Types.ObjectId(),
+      f_name: f_name,
+      l_name: l_name,
+      u_name: u_name,
+      p_hash: createPasswordHash(password), //hashing the password
+    })
+      .save()
+      .then((newUser) => {
         //if the url query has referrer then perform database transaction to do following things
         //1: increment the uearn coins of referrer by value defined in enviorenment
-        //2: push the new user's first name and last name in referrer's referral history
-        if (referrerId) {
+        //2: add new referral history document
+        if (referrerId && referrerId.length === 24) {
           async function ReferrerRewardTransction() {
             const transactionSession = await mongoose.startSession();
             try {
               transactionSession.startTransaction();
-              const referrarReferralHistory = await ReferralHistory.findById(
-                referrerId
-              );
-              referrarReferralHistory.history.push({
-                l_name: newUser.l_name,
-                f_name: newUser.f_name,
-              });
-              await referrarReferralHistory.save();
-              const referrerUser = await User.findById(referrerId);
-              referrerUser.uearn_coins =
-                referrerUser.uearn_coins +
+
+              const referrer_user_doc = await User.findById(referrerId);
+
+              //check if there is any user with  referredId if not then thwor error which will abort the transaction
+              if (!referrer_user_doc) {
+                throw Error("No user exists with _id: " + referrerId);
+              }
+              await new ReferralHistory({
+                _id: new mongoose.Types.ObjectId(),
+                referrer_user_id: new mongoose.Types.ObjectId(referrerId),
+                referred_user_id: new mongoose.Types.ObjectId(newUser._id),
+                reward_amount: Number(process.env.REFERRER_REWARD_UNIT),
+              }).save();
+
+              referrer_user_doc.uearn_coins =
+                referrer_user_doc.uearn_coins +
                 Number(process.env.REFERRER_REWARD_UNIT);
-              await referrerUser.save();
+
+              await referrer_user_doc.save();
+
               await transactionSession.commitTransaction();
             } catch (error) {
+              console.log(error);
               await transactionSession.abortTransaction();
             } finally {
-              transactionSession.endSession();
+              await transactionSession.endSession();
             }
           }
           ReferrerRewardTransction()
             .then(() => {
-              //kind of have to do nothing here, because it is going to be redirected anyhow after execution of newUserCreationTransaction
+              res.redirect("/login");
             })
             .catch((e) => {
               console.log(e);
             });
+        } else {
+          res.redirect("/login");
         }
-      } catch (e) {
-        await userCreationTransactionSession.abortTransaction();
-      } finally {
-        await userCreationTransactionSession.endSession();
-      }
-    }
-    newUserCreationTransaction()
-      .then(() => {
-        //after everything is done redirect the user to /login page
-        res.redirect("/login");
       })
       .catch((e) => {
         console.log(e);
+        res
+          .status(500)
+          .json({ success: false, error: "Something went Wrong!" });
       });
   }
 }

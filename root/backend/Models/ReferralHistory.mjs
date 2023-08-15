@@ -1,3 +1,5 @@
+//code by Dhiraj
+
 import mongoose from "mongoose";
 
 // Define the User schema
@@ -6,22 +8,17 @@ const referralHistorySchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     required: true,
   },
-  history: [
-    {
-      f_name: {
-        type: String,
-        required: true,
-      },
-      l_name: {
-        type: String,
-        required: true,
-      },
-      created_at: {
-        type: Date,
-        default: new Date(),
-      },
-    },
-  ],
+
+  referrer_user_id: {
+    type: mongoose.Schema.ObjectId,
+    required: true,
+    index: true,
+  },
+  referred_user_id: { type: mongoose.Schema.ObjectId, required: true },
+  reward_amount: {
+    type: Number,
+    required: true,
+  },
 });
 
 // Create the ReferralHistory model
