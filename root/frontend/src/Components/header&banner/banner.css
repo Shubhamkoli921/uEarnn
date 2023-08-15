@@ -1,0 +1,88 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.hero-banner{
+    /* display: grid;
+    grid-template-columns: repeat(2,50rem);
+    grid-template-rows: repeat(2fr); */
+    padding: 40px 0px;
+    position: relative;
+    background-image: linear-gradient(to right, #DDDDDD ,#1D7D81);
+}
+.content{
+    height: 100%;
+    /* margin-top: 50px; */
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: column;
+    max-width: calc(100% - 20px);
+    margin: 0px auto;
+    position: relative;
+}
+.banner-img{
+    position: relative;
+    z-index: 9;
+    width: 300px;
+    margin-bottom: 20px;
+}
+.text-content{
+    color: #213458;
+    text-align: center;
+    margin: 30px;
+    flex-direction: column;
+    align-items: center;
+}
+.text-content h1{
+    font-size: 70px;
+    font-weight: 700;
+    margin: 30px;
+    line-height: 1;
+    color: #213458;
+    margin-bottom: 20px;
+
+}
+.text-content p{
+    display: flex;
+    max-width: 400px;
+    justify-content: center;
+    font-size: 20px;
+    line-height: 30px;
+    margin:  30px auto ;
+
+}
+.button{
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+.button h2{
+    text-transform: uppercase;
+    font-size: 30px;
+    font-weight: 700;
+    width: fit-content;
+    border: 2px solid white;
+    padding: 10px 20px;
+    transition: all ease-out 0.3s;
+    cursor: pointer;
+    color: #213458;
+    /* box-shadow:2px 2px ; */
+}
+h2:hover{
+    background-color: #DDDDDD;
+    color: #213458;
+    cursor: pointer;
+    transition: all ease 0.3s;
+}
+span{
+    color: #DDDDDD;
+}
+.highlight{
+    opacity: 0.7;
+}
+@media screen and (max-width: 800px){
+    .text-content h1{
+        font-size: 45px;
+    }
+}
