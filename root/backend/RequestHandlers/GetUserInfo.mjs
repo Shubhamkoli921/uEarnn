@@ -4,4 +4,24 @@
 //get u_uid from request  => req['uid']
 //make a findone request using mongoose with mongoose search parameter _id ,  use projection to only get the fields that is in the array
 
-export default function GetUserInfo(req, res) {}
+export async function GetUserInfo(req, res) {
+    const { username }= req.params;
+
+    try{
+        if(!username)return res.status(501).send({ error:"Invalid Username"});
+
+        User.findOne({ username }, function(err,user){
+            if(err) return res.status(500).send({err});
+            if(!user) return res.status(501).send({ error : "User Doesn't exist"});
+
+
+            //remove password from user
+            // mongoose return uncessary data into json
+
+            const {password,...rest} = Object.assign({},user.toJSON());
+            return res.status(201).send(rest);
+        })
+    } catch (error) {
+        return res.status(404).send({error : "Cannot Find User Data"});
+    }
+}
