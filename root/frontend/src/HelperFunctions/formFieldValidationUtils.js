@@ -32,13 +32,15 @@ export function validatePassword(password) {
 export function validateFirstName(firstName) {
   firstName = firstName.trim();
   if (!firstName) return "Firstname can't be empty";
-  else if (firstName > 30) return "Firstname must be less than 30 characters";
+  else if (firstName.length > 30)
+    return "Firstname must be less than 30 characters";
   return null;
 }
 
 export function validateLastName(lastName) {
   lastName = lastName.trim();
   if (!lastName) return "Lastname can't be empty";
-  else if (lastName > 30) return "Lastname must be less than 30 characters";
+  else if (lastName.length > 30)
+    return "Lastname must be less than 30 characters";
   return null;
 }

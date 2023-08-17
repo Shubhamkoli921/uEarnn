@@ -18,7 +18,7 @@ export function isValidPassword(password) {
   password = password.trim();
   if (
     password === "" ||
-    password.length < 6 ||
+    password.length < 7 ||
     password.length > 30 ||
     !/.*[!@#$%^&*()\-_=+{}\[\]:;<>,.?/~].*/i.test(password)
   ) {

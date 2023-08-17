@@ -78,13 +78,13 @@ export default function Signup(req, res) {
           }
           ReferrerRewardTransction()
             .then(() => {
-              res.redirect("/login");
+              res.json({ success: true, data: null });
             })
             .catch((e) => {
               console.log(e);
             });
         } else {
-          res.redirect("/login");
+          res.json({ success: true, data: null });
         }
       })
       .catch((e) => {
