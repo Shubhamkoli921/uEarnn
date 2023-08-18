@@ -20,8 +20,8 @@ function Login (){
     if(login){
       axios.post("http://localhost:5000/api/login",{u_name,password})
       .then((respone)=>{
-        // console.log(respone)
-        alert(respone.data.message)
+        console.log(respone)
+        // console.log(respone.data.message)
         
       })
       .catch((err)=>{
@@ -39,7 +39,6 @@ function Login (){
   
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-2">
-      {console.log("user",u_name)}
       <div className="relative w-full sm:max-w-md md:max-w-lg flex flex-col gap-3 p-3 py-5 bg-slate-50 rounded-md divide-y">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 pt-4">
       <FormInput
