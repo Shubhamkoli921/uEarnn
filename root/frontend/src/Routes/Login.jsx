@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 
 function Login (){
   
-  const [userName ,setUserName] = useState("");
+  const [u_name ,setUserName] = useState("");
   const [password,setPassword] = useState("");
   const [userNameError, setUserNameError] = useState(undefined);
   const [passwordError, setPasswordError] = useState(undefined);
@@ -18,9 +18,11 @@ function Login (){
   const handleSubmit =(e)=>{
     e.preventDefault()
     if(login){
-      axios.post("http://localhost:5000/api/login",{userName,password})
+      axios.post("http://localhost:5000/api/login",{u_name,password})
       .then((respone)=>{
-        console.log(respone)
+        // console.log(respone)
+        alert(respone.data.message)
+        
       })
       .catch((err)=>{
         console.log(err)
@@ -37,13 +39,14 @@ function Login (){
   
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-2">
+      {console.log("user",u_name)}
       <div className="relative w-full sm:max-w-md md:max-w-lg flex flex-col gap-3 p-3 py-5 bg-slate-50 rounded-md divide-y">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 pt-4">
       <FormInput
                 type={"text"}
                 name={"UserName"}
                 placeholder={"Username..."}
-                value={userName}
+                value={u_name}
                 onChange={(e)=>{setUserName(e.target.value)
                   setUserNameError(validateUsername(e.target.value));
                 }}
