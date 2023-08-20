@@ -21,5 +21,9 @@
     "jsonwebtoken": "^9.0.1",
     "mongoose": "^7.4.3"
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "jest": "^29.6.2",
+    "supertest": "^6.3.3"
+  }
 }

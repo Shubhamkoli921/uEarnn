@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import FormInput from "../Components/FormComponents/FormInput";
 import {
   validateFirstName,
@@ -9,6 +9,7 @@ import {
 import postSignupForm from "../HelperFunctions/postSignupForm";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import ViewPasswordButton from "../Components/FormComponents/ViewPasswordButton";
 
 function Signup() {
   const [currentSection, setCurrentSection] = useState("userDataForm");
@@ -28,7 +29,20 @@ function Signup() {
   const [isFormDataValid, setIsFormDataValid] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(false);
 
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  const firstNameRef = useRef(null);
+  const passwordRef = useRef(null);
+
   const navigate = useNavigate();
+
+  useEffect(() => {
+    document.title = "Signup to uEarn";
+  }, []);
+
+  useEffect(() => {
+    firstNameRef.current?.focus();
+  }, []);
 
   //case if user is already logged in
   const [userLoginStatus, setUserLoginStatus] = useState(undefined);
@@ -110,6 +124,7 @@ function Signup() {
             )}
             <form className="flex flex-col gap-4 pt-4">
               <FormInput
+                inputTagRef={firstNameRef}
                 type={"text"}
                 name={"First name"}
                 placeholder={"First name..."}
@@ -143,7 +158,7 @@ function Signup() {
                 error={userNameError}
               ></FormInput>
               <FormInput
-                type={"password"}
+                type={isPasswordVisible ? "text" : "password"}
                 name={"Password"}
                 placeholder={"Password..."}
                 value={password}
@@ -152,6 +167,16 @@ function Signup() {
                   setPasswordError(validatePassword(e.target.value));
                 }}
                 error={passwordError}
+                AdjecentElement={
+                  <ViewPasswordButton
+                    isPasswordVisible={isPasswordVisible}
+                    togglePasswordVisibility={() => {
+                      setIsPasswordVisible((prev) => !prev);
+                      passwordRef.current.focus();
+                    }}
+                  />
+                }
+                inputTagRef={passwordRef}
               ></FormInput>
             </form>
           </div>

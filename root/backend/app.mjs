@@ -13,6 +13,8 @@ import CheckLoginStatus from "./RequestHandlers/CheckLoginStatus.mjs";
 //middelwares
 import AuthenticateUser from "./Middlewares/AuthenticateUser.mjs";
 import cookieParser from "cookie-parser";
+import Logout from "./RequestHandlers/LogOut.mjs";
+import GetReferralHistory from "./RequestHandlers/GetReferralHistory.mjs";
 
 /**
  * @description Creates new express server instance
@@ -43,6 +45,8 @@ export default async function app() {
 
   //authenticated routes
   app.get("/api/user-info", AuthenticateUser, GetUserInfo);
+  app.get("/api/logout", AuthenticateUser, Logout);
+  app.get("/api/referral-history", AuthenticateUser, GetReferralHistory);
 
   app.listen(process.env.PORT, () => {
     console.log(
