@@ -38,7 +38,7 @@ export function isValidUsername(username) {
     username === "" ||
     username.length < 6 ||
     username.length > 20 ||
-    !/^[a-zA-Z0-9_]+$/i.test(username)
+    !/^[a-zA-Z0-9_]+$/.test(username)
   ) {
     return false;
   }

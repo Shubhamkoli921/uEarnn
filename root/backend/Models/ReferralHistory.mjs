@@ -19,6 +19,11 @@ const referralHistorySchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  created_at: {
+    type: Date,
+    default: new Date(),
+    required: true,
+  },
 });
 
 // Create the ReferralHistory model
