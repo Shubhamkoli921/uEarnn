@@ -25,7 +25,7 @@ export default async function GetUserInfo(req, res) {
       User.findById(userId, projectionString)
         .then((userDoc) => {
           if (userDoc) {
-            res.json(userDoc);
+            res.json({ success: true, data: userDoc });
           } else {
             res
               .status(500)

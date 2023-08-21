@@ -49,7 +49,7 @@ export default function login(req, res) {
                 expires: daysjs().add(30, "days").toDate(),
               }
             );
-            res.redirect("/dashboard");
+            res.json({ success: true, data: null });
           } else {
             res.status(404).json({
               success: false,
