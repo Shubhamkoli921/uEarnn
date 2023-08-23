@@ -2,7 +2,7 @@
 
 export function validateUsername(username) {
   username = username.trim();
-  if (!username === "") return "Username can't be empty";
+  if (!username) return "Username can't be empty";
   else if (!/^[a-zA-Z0-9_]+$/.test(username))
     return "Username must not contain any special characters except _";
   else if (username.length < 6 || username.length > 20)
