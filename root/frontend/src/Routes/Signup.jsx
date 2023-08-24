@@ -10,6 +10,7 @@ import postSignupForm from "../HelperFunctions/postSignupForm";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ViewPasswordButton from "../Components/FormComponents/ViewPasswordButton";
+import CheckUserNameExistence from "../Components/FormComponents/CheckUserNameExistence";
 
 function Signup() {
   const [currentSection, setCurrentSection] = useState("userDataForm");
@@ -156,6 +157,14 @@ function Signup() {
                   setUserNameError(validateUsername(e.target.value));
                 }}
                 error={userNameError}
+                AdjecentElement={
+                  !userNameError && userNameError !== undefined ? (
+                    <CheckUserNameExistence
+                      userName={userName}
+                      setUserNameError={setUserNameError}
+                    />
+                  ) : null
+                }
               ></FormInput>
               <FormInput
                 type={isPasswordVisible ? "text" : "password"}
