@@ -37,55 +37,12 @@ export default function Signup(req, res) {
       l_name: l_name,
       u_name: u_name,
       p_hash: createPasswordHash(password), //hashing the password
+      is_referred: referrerId && referrerId.length === 24 ? true : false,
+      referrer_id: referrerId && referrerId.length === 24 ? referrerId : null,
     })
       .save()
       .then((newUser) => {
-        //if the url query has referrer then perform database transaction to do following things
-        //1: increment the uearn coins of referrer by value defined in enviorenment
-        //2: add new referral history document
-        if (referrerId && referrerId.length === 24) {
-          async function ReferrerRewardTransction() {
-            const transactionSession = await mongoose.startSession();
-            try {
-              transactionSession.startTransaction();
-
-              const referrer_user_doc = await User.findById(referrerId);
-
-              //check if there is any user with  referredId if not then thwor error which will abort the transaction
-              if (!referrer_user_doc) {
-                throw Error("No user exists with _id: " + referrerId);
-              }
-              await new ReferralHistory({
-                _id: new mongoose.Types.ObjectId(),
-                referrer_user_id: new mongoose.Types.ObjectId(referrerId),
-                referred_user_id: new mongoose.Types.ObjectId(newUser._id),
-                reward_amount: Number(process.env.REFERRER_REWARD_UNIT),
-              }).save();
-
-              referrer_user_doc.uearn_coins =
-                referrer_user_doc.uearn_coins +
-                Number(process.env.REFERRER_REWARD_UNIT);
-
-              await referrer_user_doc.save();
-
-              await transactionSession.commitTransaction();
-            } catch (error) {
-              console.log(error);
-              await transactionSession.abortTransaction();
-            } finally {
-              await transactionSession.endSession();
-            }
-          }
-          ReferrerRewardTransction()
-            .then(() => {
-              res.json({ success: true, data: null });
-            })
-            .catch((e) => {
-              console.log(e);
-            });
-        } else {
-          res.json({ success: true, data: null });
-        }
+        res.json({ success: true, data: null });
       })
       .catch((e) => {
         console.log(e);

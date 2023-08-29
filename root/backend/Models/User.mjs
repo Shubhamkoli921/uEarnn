@@ -22,9 +22,19 @@ const userSchema = new mongoose.Schema({
     unique: true,
     index: true,
   },
+  m_number: {
+    type: Number,
+    default: "1234567890",
+    required: true,
+  },
   p_hash: {
     type: String,
     required: true,
+  },
+  initial_payment_completed: {
+    type: Boolean,
+    required: true,
+    default: false,
   },
   uearn_coins: {
     type: Number,
@@ -33,6 +43,13 @@ const userSchema = new mongoose.Schema({
   created_at: {
     type: Date,
     default: new Date(),
+  },
+  is_referred: {
+    type: Boolean,
+    required: true,
+  },
+  referrer_id: {
+    type: String,
   },
 });
 

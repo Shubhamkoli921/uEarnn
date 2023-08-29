@@ -11,6 +11,8 @@ export default function Dashboard() {
   const [uEarnCoins, setuEarnCoins] = useState(null);
   const [copyButtonText, setCopyButtonText] = useState("Copy");
   const [logoutButtonChild, setLogoutButtonChild] = useState("Log out");
+  const [isInitialPaymentCompleted, setInitialPaymentCompletedStatus] =
+    useState(undefined);
 
   const [settingsOverlayStatus, setSettingsOverlayStatus] = useState("closed");
   const toggleSettingsOverlay = (e) => {
@@ -28,12 +30,25 @@ export default function Dashboard() {
     document.title = "Dashboard";
   }, []);
 
+  //check initial payment status
+  useEffect(() => {
+    axios("/api/check-initial-payment-status", { withCredentials: true })
+      .then((response) => {
+        if (response.data.data === true) setInitialPaymentCompletedStatus(true);
+        else setInitialPaymentCompletedStatus(false);
+        console.log(response.data.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
   //case if user is not logged in
   const [userLoginStatus, setUserLoginStatus] = useState(undefined);
   useEffect(() => {
     if (userLoginStatus === undefined) {
       axios
-        .get("/api/login-status")
+        .get("/api/login-status", { withCredentials: true })
         .then((response) => {
           if (response.data.data === "loggedin") {
             setUserLoginStatus("loggedin");
@@ -50,7 +65,9 @@ export default function Dashboard() {
   useEffect(() => {
     if (userLoginStatus === "loggedin") {
       axios
-        .get("/api/user-info?query=f_name,uearn_coins")
+        .get("/api/user-info?query=f_name,uearn_coins", {
+          withCredentials: true,
+        })
         .then((response) => {
           setUserId(response.data.data["_id"]);
           setUserFirstName(response.data.data["f_name"]);
@@ -84,7 +101,7 @@ export default function Dashboard() {
       </svg>
     );
     axios
-      .get("/api/logout")
+      .get("/api/logout", { withCredentials: true })
       .then((response) => {
         navigate.current("/login");
       })
@@ -262,43 +279,61 @@ export default function Dashboard() {
             </div>
           </div>
         )}
-        <div className="flex flex-col rounded-md bg-slate-50 text-[#213458] overflow-hidden w-full max-w-5xl shrink-0">
-          <div className="text-lg font-bold p-3 text-center">
-            Copy the referal link and share it in your network, upon each
-            successfull registration through your referal link, you will be
-            rewarded with 100 uEarn coins.
-          </div>
-          {userId ? (
-            <div className="w-full flex flex-row gap-2 items-center px-3 py-2 bg-slate-100">
-              <p
-                ref={referralLinkElementRef}
-                className="mr-auto border w-full px-3 py-1 rounded-md bg-white whitespace-nowrap overflow-x-clip"
-              >
-                {createReferralLink(userId)}
-              </p>
-              <button
-                className="px-3 py-1 shrink-0 bg-[#213458] text-white rounded-md"
-                type="button"
-                onClick={() => {
-                  copyContentsFromElement(
-                    referralLinkElementRef.current,
-                    () => {
-                      setCopyButtonText("Copied!");
-                      setTimeout(() => {
-                        setCopyButtonText("Copy");
-                      }, 2000);
-                    }
-                  );
-                }}
-              >
-                {copyButtonText}
-              </button>
+        {isInitialPaymentCompleted !== undefined &&
+        isInitialPaymentCompleted ? (
+          <>
+            <div className="flex flex-col rounded-md bg-slate-50 text-[#213458] overflow-hidden w-full max-w-5xl shrink-0">
+              <div className="text-base sm:text-lg font-bold p-3 text-center">
+                Copy the referal link and share it in your network, upon each
+                successfull registration through your referal link, you will be
+                rewarded with 100 uEarn coins.
+              </div>
+              {userId ? (
+                <div className="w-full flex flex-row gap-2 items-center px-3 py-2 bg-slate-100">
+                  <p
+                    ref={referralLinkElementRef}
+                    className="mr-auto border w-full px-3 py-1 rounded-md bg-white whitespace-nowrap overflow-x-clip"
+                  >
+                    {createReferralLink(userId)}
+                  </p>
+                  <button
+                    className="px-3 py-1 shrink-0 bg-[#213458] text-white rounded-md"
+                    type="button"
+                    onClick={() => {
+                      copyContentsFromElement(
+                        referralLinkElementRef.current,
+                        () => {
+                          setCopyButtonText("Copied!");
+                          setTimeout(() => {
+                            setCopyButtonText("Copy");
+                          }, 2000);
+                        }
+                      );
+                    }}
+                  >
+                    {copyButtonText}
+                  </button>
+                </div>
+              ) : (
+                <div className="bg-slate-200 py-5 w-full animate-pulse"></div>
+              )}
             </div>
-          ) : (
-            <div className="bg-slate-200 py-5 w-full animate-pulse"></div>
-          )}
-        </div>
-        <ReferralHistory />
+            <ReferralHistory />
+          </>
+        ) : (
+          <div className="flex flex-col rounded-md bg-slate-50 text-[#213458] overflow-hidden w-full max-w-5xl shrink-0 p-2">
+            <div className="text-lg font-bold p-3 text-center">
+              Pay 200Rs to enjoy the amazing features of uEarn and earn uEarn
+              coins through referrals.
+            </div>
+            <Link
+              className="bg-[#213458] text-slate-100 ml-auto py-1 px-3 rounded-md"
+              to={"/payments?transaction-type=account-activation"}
+            >
+              Proceed to pay
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );

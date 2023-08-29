@@ -6,15 +6,12 @@ import {
   validateUsername,
   validatePassword,
 } from "../HelperFunctions/formFieldValidationUtils";
-import postSignupForm from "../HelperFunctions/postSignupForm";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ViewPasswordButton from "../Components/FormComponents/ViewPasswordButton";
 import CheckUserNameExistence from "../Components/FormComponents/CheckUserNameExistence";
 
 function Signup() {
-  const [currentSection, setCurrentSection] = useState("userDataForm");
-
   //form fields state
   const [firstName, setFirstName] = useState("");
   const [firstNameError, setFirstNameError] = useState(undefined);
@@ -28,12 +25,13 @@ function Signup() {
   const [formError, setFormError] = useState(null);
 
   const [isFormDataValid, setIsFormDataValid] = useState(false);
-  const [paymentStatus, setPaymentStatus] = useState(false);
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const firstNameRef = useRef(null);
   const passwordRef = useRef(null);
+
+  const [signupButtonChild, setSignupButtonChild] = useState("Signup");
 
   const navigate = useNavigate();
 
@@ -88,21 +86,44 @@ function Signup() {
     setIsFormDataValid,
   ]);
 
-  useEffect(() => {
-    if (paymentStatus)
-      postSignupForm(
-        {
-          f_name: firstName,
-          l_name: lastName,
-          u_name: userName,
-          password: password,
-        },
-        () => {
-          navigate("/login");
-        },
-        setFormError
-      );
-  }, [paymentStatus, firstName, lastName, userName, password, navigate]);
+  function postSignupForm(formData) {
+    const referrerId = new URLSearchParams(document.location.search).get(
+      "referrer"
+    );
+    const postUrl = `/api/signup${referrerId ? `?referrer=${referrerId}` : ""}`;
+
+    setSignupButtonChild(
+      <svg
+        width="100%"
+        height="100%"
+        viewBox="0 0 16 16"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        className="animate-spin"
+      >
+        <g fill="#fff" fillRule="evenodd" clipRule="evenodd">
+          <path
+            d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8z"
+            opacity=".2"
+          />
+
+          <path d="M7.25.75A.75.75 0 018 0a8 8 0 018 8 .75.75 0 01-1.5 0A6.5 6.5 0 008 1.5a.75.75 0 01-.75-.75z" />
+        </g>
+      </svg>
+    );
+    axios
+      .post(postUrl, formData, {
+        headers: { "Content-Type": "application/json" },
+      })
+      .then((responseData) => {
+        navigate("/login");
+      })
+      .catch((error) => {
+        setFormError(error.response.data.error);
+        setSignupButtonChild("Signup");
+      });
+  }
+
   const referrerId = new URLSearchParams(document.location.search).get(
     "referrer"
   );
@@ -116,115 +137,99 @@ function Signup() {
             platform.
           </div>
         )}
-        {currentSection === "userDataForm" ? (
-          <div className="flex flex-col gap-4 divide-y">
-            {!referrerId && (
-              <div className="text-2xl text-center px-2 font-bold text-[#213458]">
-                Sign up to uEarn
-              </div>
-            )}
-            <form className="flex flex-col gap-4 pt-4">
-              <FormInput
-                inputTagRef={firstNameRef}
-                type={"text"}
-                name={"First name"}
-                placeholder={"First name..."}
-                value={firstName}
-                onChange={(e) => {
-                  setFirstName(e.target.value);
-                  setFirstNameError(validateFirstName(e.target.value));
-                }}
-                error={firstNameError}
-              ></FormInput>
-              <FormInput
-                type={"text"}
-                name={"Last name"}
-                placeholder={"Last name..."}
-                value={lastName}
-                onChange={(e) => {
-                  setLastName(e.target.value);
-                  setLastNameError(validateLastName(e.target.value));
-                }}
-                error={lastNameError}
-              ></FormInput>
-              <FormInput
-                type={"text"}
-                name={"UserName"}
-                placeholder={"Username..."}
-                value={userName}
-                onChange={(e) => {
-                  setUserName(e.target.value);
-                  setUserNameError(validateUsername(e.target.value));
-                }}
-                error={userNameError}
-                AdjecentElement={
-                  !userNameError && userNameError !== undefined ? (
-                    <CheckUserNameExistence
-                      userName={userName}
-                      setUserNameError={setUserNameError}
-                    />
-                  ) : null
-                }
-              ></FormInput>
-              <FormInput
-                type={isPasswordVisible ? "text" : "password"}
-                name={"Password"}
-                placeholder={"Password..."}
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setPasswordError(validatePassword(e.target.value));
-                }}
-                error={passwordError}
-                AdjecentElement={
-                  <ViewPasswordButton
-                    isPasswordVisible={isPasswordVisible}
-                    togglePasswordVisibility={() => {
-                      setIsPasswordVisible((prev) => !prev);
-                      passwordRef.current.focus();
-                    }}
-                  />
-                }
-                inputTagRef={passwordRef}
-              ></FormInput>
-            </form>
-          </div>
-        ) : (
-          <button
-            className="border border-blue-500"
-            onClick={() => {
-              setPaymentStatus(true);
+        <div className="flex flex-col gap-4 divide-y">
+          {!referrerId && (
+            <div className="text-2xl text-center px-2 font-bold text-[#213458]">
+              Sign up to uEarn
+            </div>
+          )}
+          <form
+            className="flex flex-col gap-4 pt-4"
+            onSubmit={(e) => {
+              e.preventDefault();
+              postSignupForm({
+                f_name: firstName,
+                l_name: lastName,
+                u_name: userName,
+                password: password,
+              });
             }}
           >
-            Complete Payment
-          </button>
-        )}
-        <div className="flex flex-row items-center pt-4">
-          <div className="w-full flex justify-center items-center">
-            {currentSection === "userDataForm" ? null : (
+            <FormInput
+              inputTagRef={firstNameRef}
+              type={"text"}
+              name={"First name"}
+              placeholder={"First name..."}
+              value={firstName}
+              onChange={(e) => {
+                setFirstName(e.target.value);
+                setFirstNameError(validateFirstName(e.target.value));
+              }}
+              error={firstNameError}
+            ></FormInput>
+            <FormInput
+              type={"text"}
+              name={"Last name"}
+              placeholder={"Last name..."}
+              value={lastName}
+              onChange={(e) => {
+                setLastName(e.target.value);
+                setLastNameError(validateLastName(e.target.value));
+              }}
+              error={lastNameError}
+            ></FormInput>
+            <FormInput
+              type={"text"}
+              name={"UserName"}
+              placeholder={"Username..."}
+              value={userName}
+              onChange={(e) => {
+                setUserName(e.target.value);
+                setUserNameError(validateUsername(e.target.value));
+              }}
+              error={userNameError}
+              AdjecentElement={
+                !userNameError && userNameError !== undefined ? (
+                  <CheckUserNameExistence
+                    userName={userName}
+                    setUserNameError={setUserNameError}
+                  />
+                ) : null
+              }
+            ></FormInput>
+            <FormInput
+              type={isPasswordVisible ? "text" : "password"}
+              name={"Password"}
+              placeholder={"Password..."}
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setPasswordError(validatePassword(e.target.value));
+              }}
+              error={passwordError}
+              AdjecentElement={
+                <ViewPasswordButton
+                  isPasswordVisible={isPasswordVisible}
+                  togglePasswordVisibility={() => {
+                    setIsPasswordVisible((prev) => !prev);
+                    passwordRef.current.focus();
+                  }}
+                />
+              }
+              inputTagRef={passwordRef}
+            ></FormInput>
+            <div className="w-full flex justify-center items-center">
               <button
-                className=" w-full py-2 rounded-md bg-[#213458] text-white"
-                onClick={() => {
-                  setCurrentSection("userDataForm");
-                }}
+                type="submit"
+                className="w-full h-10 py-2 rounded-md bg-[#213458] disabled:bg-slate-500 text-white"
+                disabled={isFormDataValid ? false : true}
               >
-                Prev
+                {signupButtonChild}
               </button>
-            )}
-          </div>
-          <div className="w-full flex justify-center items-center">
-            {currentSection === "userDataForm" && isFormDataValid ? (
-              <button
-                className="w-full py-2 rounded-md bg-[#213458] text-white"
-                onClick={() => {
-                  setCurrentSection("paymentInterface");
-                }}
-              >
-                Next
-              </button>
-            ) : null}
-          </div>
+            </div>
+          </form>
         </div>
+
         {formError && (
           <span className="bg-red-50 py-1 px-3 text-sm text-red-500 rounded-md">
             {formError}

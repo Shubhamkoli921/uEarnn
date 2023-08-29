@@ -2,7 +2,6 @@
 
 import mongoose from "mongoose";
 
-// Define the User schema
 const referralHistorySchema = new mongoose.Schema({
   _id: {
     type: mongoose.Schema.ObjectId,

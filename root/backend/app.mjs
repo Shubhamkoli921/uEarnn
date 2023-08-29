@@ -15,6 +15,10 @@ import AuthenticateUser from "./Middlewares/AuthenticateUser.mjs";
 import cookieParser from "cookie-parser";
 import Logout from "./RequestHandlers/LogOut.mjs";
 import GetReferralHistory from "./RequestHandlers/GetReferralHistory.mjs";
+import checkInitialPaymentStatus from "./RequestHandlers/checkInitialPaymentStatus.mjs";
+import GeneratePaymentToken from "./RequestHandlers/Payments/GeneratePaymentToken.mjs";
+import CheckOut from "./RequestHandlers/Payments/CheckOut.mjs";
+import path from "path";
 
 /**
  * @description Creates new express server instance
@@ -44,9 +48,25 @@ export default async function app() {
   app.get("/api/login-status", CheckLoginStatus);
 
   //authenticated routes
+  app.get(
+    "/api/check-initial-payment-status",
+    AuthenticateUser,
+    checkInitialPaymentStatus
+  );
   app.get("/api/user-info", AuthenticateUser, GetUserInfo);
   app.get("/api/logout", AuthenticateUser, Logout);
   app.get("/api/referral-history", AuthenticateUser, GetReferralHistory);
+  app.get(
+    "/api/generate-payment-token",
+    AuthenticateUser,
+    GeneratePaymentToken
+  );
+  app.post("/api/check-out", AuthenticateUser, CheckOut);
+
+  app.use(express.static("./public"));
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve("public", "index.html"));
+  });
 
   app.listen(process.env.PORT, () => {
     console.log(

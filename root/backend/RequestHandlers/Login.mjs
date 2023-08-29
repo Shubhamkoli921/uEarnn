@@ -45,7 +45,7 @@ export default function login(req, res) {
               `Bearer ${createAuthToken({ uid: user._id })}`,
               {
                 httpOnly: true,
-                secure: true,
+                secure: false, //need to figure out the issue, when set secure=true it does not sets the cookie
                 expires: daysjs().add(30, "days").toDate(),
               }
             );

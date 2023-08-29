@@ -48,7 +48,11 @@ function Login() {
       </svg>
     );
     axios
-      .post("/api/login", { u_name: userName, password })
+      .post(
+        "/api/login",
+        { u_name: userName, password },
+        { withCredentials: true }
+      )
       .then((response) => {
         navigate.current("/dashboard");
       })
@@ -84,7 +88,7 @@ function Login() {
   useEffect(() => {
     if (userLoginStatus === undefined) {
       axios
-        .get("/api/login-status")
+        .get("/api/login-status", { withCredentials: true })
         .then((response) => {
           if (response.data.data === "loggedin") {
             setUserLoginStatus("loggedin");

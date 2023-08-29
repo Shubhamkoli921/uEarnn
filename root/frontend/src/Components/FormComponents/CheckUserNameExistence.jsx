@@ -4,8 +4,9 @@ import axios from "axios";
 export default function CheckUserNameExistence({ userName, setUserNameError }) {
   const [userNameExistenceStatus, setUserNameExistenceStatus] =
     useState(undefined);
-  const requestController = new AbortController();
+
   useEffect(() => {
+    const requestController = new AbortController();
     axios
       .get(`/api/check-username/${userName}`, {
         signal: requestController.signal,
@@ -24,9 +25,9 @@ export default function CheckUserNameExistence({ userName, setUserNameError }) {
     return () => {
       requestController.abort();
     };
-  });
+  }, [userName, setUserNameError]);
   return (
-    <button className="h-10 w-10 p-1 group" type="button">
+    <div className="h-10 w-10 p-1 group" type="button">
       {userNameExistenceStatus === undefined ? (
         <svg
           width="100%"
@@ -66,6 +67,6 @@ export default function CheckUserNameExistence({ userName, setUserNameError }) {
           />
         </svg>
       )}
-    </button>
+    </div>
   );
 }
